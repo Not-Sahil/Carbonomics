@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Carbonomics v2 — Digital Sustainability</title>
+<style>
+/* ── Reset & Fonts ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b1410;--bg2:#0f1d18;--bg3:#142218;--bgc:#162218;--bgh:#1c2e22;
+  --b1:#213028;--b2:#2c4038;--gd:#0d4a30;--g:#0f7a4e;--gm:#14a86a;
+  --gh:#1dd882;--teal:#0ac8aa;--amber:#f5a623;--red:#e85555;--blue:#4a9eff;
+  --t:#e8f0ec;--t2:#9ab8a8;--t3:#5a7a68;
+  --ff:'DM Sans',system-ui,sans-serif;--fm:'DM Mono',monospace;
+  --r:10px;--rl:16px;
+}
+html,body{height:100%;background:var(--bg);color:var(--t);font-family:var(--ff);font-size:14px;line-height:1.5;overflow:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+button,input,select{font-family:var(--ff)}
+
+/* ── Layout ─────────────────────────────────────────── */
+.app{display:flex;height:100vh}
+.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.main{flex:1;overflow-y:auto;background:var(--bg)}
+.page{display:none;padding:28px 32px}
+.page.active{display:block}
+
+/* ── Sidebar ────────────────────────────────────────── */
+.sb-logo{padding:20px 16px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--b1)}
+.sb-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--g),var(--gm));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-logo h2{font-size:14px;font-weight:700;color:var(--t)}
+.sb-logo p{font-size:10px;color:var(--t3);margin-top:1px}
+.sb-sec{padding:12px 12px 4px;font-size:9px;font-weight:700;letter-spacing:1.2px;color:var(--t3);text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;margin:1px 6px;border-radius:8px;cursor:pointer;color:var(--t2);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:calc(100% - 12px);text-align:left}
+.nav-item:hover{background:var(--bgh);color:var(--t)}
+.nav-item.active{background:var(--gd);color:var(--gh)}
+.nav-icon{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.sb-footer{padding:12px;margin:8px;background:var(--bg3);border-radius:12px;border:1px solid var(--b1)}
+.sb-footer-lbl{font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--gh);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-kg{font-size:22px;font-weight:700;color:var(--gh);font-variant-numeric:tabular-nums}
+.sb-kg-lbl{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* ── Page Header ────────────────────────────────────── */
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px}
+.ph h1{font-size:24px;font-weight:700;color:var(--t)}
+.ph p{font-size:13px;color:var(--t2);margin-top:3px}
+.ph-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+
+/* ── Buttons ────────────────────────────────────────── */
+.btn{padding:8px 15px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.btn-primary{background:var(--g);color:#fff}
+.btn-primary:hover{background:var(--gm)}
+.btn-outline{background:transparent;color:var(--t2);border:1px solid var(--b2)}
+.btn-outline:hover{border-color:var(--g);color:var(--gh)}
+.btn-lg{padding:12px 20px;font-size:14px;width:100%;justify-content:center}
+
+/* ── Stat Cards ─────────────────────────────────────── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:50px;height:50px;background:rgba(29,216,130,.07);border-radius:0 var(--rl) 0 50px}
+.stat-icon{position:absolute;top:14px;right:12px;font-size:20px;opacity:.5}
+.stat-label{font-size:10px;font-weight:700;letter-spacing:.7px;color:var(--t3);text-transform:uppercase;margin-bottom:7px}
+.stat-value{font-size:22px;font-weight:700;color:var(--t);line-height:1.1;font-variant-numeric:tabular-nums}
+.stat-sub{font-size:11px;color:var(--t3);margin-top:4px}
+
+/* ── Card ───────────────────────────────────────────── */
+.card{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:4px}
+.card-sub{font-size:11px;color:var(--t3);margin-bottom:16px}
+
+/* ── Grid ───────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g-main{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+
+/* ── Upload Zone ────────────────────────────────────── */
+.upload-zone{border:2px dashed var(--b2);border-radius:14px;padding:36px 24px;text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--g);background:var(--bgh)}
+.upload-zone input{display:none}
+.upload-icon{font-size:42px;margin-bottom:10px}
+.upload-title{font-size:15px;font-weight:700;color:var(--t);margin-bottom:6px}
+.upload-sub{font-size:12px;color:var(--t3);line-height:1.8}
+.schema{background:var(--bg2);border:1px solid var(--b1);border-radius:8px;padding:12px;font-family:var(--fm);font-size:11px;color:var(--t3);text-align:left;margin-top:14px;line-height:1.9;white-space:pre}
+
+/* ── Form ───────────────────────────────────────────── */
+.form-row{margin-bottom:13px}
+.form-label{font-size:12px;font-weight:600;color:var(--t2);margin-bottom:5px;display:flex;justify-content:space-between}
+.form-input{width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t);font-size:13px;outline:none;transition:border .15s}
+.form-input:focus{border-color:var(--g)}
+.form-select{width:100%;padding:9px 11px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t);font-size:13px;cursor:pointer;outline:none}
+.form-select option{background:var(--bg3)}
+.slider-wrap{margin-bottom:13px}
+.slider-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.slider-lbl{font-size:12px;font-weight:600;color:var(--t2)}
+.slider-val{font-family:var(--fm);font-size:12px;color:var(--gh);background:var(--gd);padding:1px 7px;border-radius:4px}
+input[type=range]{width:100%;accent-color:var(--gh);cursor:pointer;height:4px}
+
+/* ── Table ──────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--t3);padding:9px 10px;border-bottom:1px solid var(--b1);text-align:left;white-space:nowrap}
+td{padding:10px 10px;border-bottom:1px solid var(--b1);font-size:12px;color:var(--t)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bgh)}
+.mono{font-family:var(--fm);font-size:11px}
+
+/* ── Badge ──────────────────────────────────────────── */
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;display:inline-block}
+.badge-green{background:rgba(29,216,130,.15);color:var(--gh)}
+.badge-amber{background:rgba(245,166,35,.15);color:var(--amber)}
+.badge-red{background:rgba(232,85,85,.15);color:var(--red)}
+.badge-blue{background:rgba(74,158,255,.15);color:var(--blue)}
+.badge-gray{background:rgba(90,122,104,.12);color:var(--t2)}
+
+/* ── Progress ───────────────────────────────────────── */
+.prog-track{height:6px;background:var(--b1);border-radius:3px;overflow:hidden;margin-top:5px}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--gh));border-radius:3px;transition:width .5s}
+
+/* ── Hbar ───────────────────────────────────────────── */
+.hbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.hbar-label{width:120px;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar-track{flex:1;height:18px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.hbar-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--gh));border-radius:4px;display:flex;align-items:center;padding-left:6px;transition:width .5s;min-width:2px}
+.hbar-fill-txt{font-size:9px;font-weight:700;color:#fff;white-space:nowrap}
+.hbar-val{width:60px;font-family:var(--fm);font-size:11px;color:var(--t2)}
+
+/* ── SVG Chart ──────────────────────────────────────── */
+.chart-wrap{width:100%;position:relative}
+.chart-wrap svg{width:100%;display:block}
+.chart-tooltip{position:absolute;background:var(--bgc);border:1px solid var(--b2);border-radius:7px;padding:7px 10px;font-size:11px;pointer-events:none;display:none;color:var(--t);white-space:nowrap;z-index:10}
+
+/* ── Live Meter ─────────────────────────────────────── */
+.live-meter{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:20px;overflow:hidden;position:relative}
+.live-meter::after{content:'';position:absolute;bottom:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(29,216,130,.08)}
+.lm-big{font-size:40px;font-weight:700;color:var(--gh);line-height:1;font-variant-numeric:tabular-nums}
+.lm-unit{font-size:13px;color:var(--t3);font-weight:400}
+.lm-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.lm-item{background:var(--bg3);border-radius:8px;padding:9px 11px}
+.lm-item-lbl{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+.lm-item-val{font-family:var(--fm);font-size:13px;color:var(--t);margin-top:3px;font-variant-numeric:tabular-nums}
+
+/* ── Equiv Cards ────────────────────────────────────── */
+.equiv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.equiv-card{background:var(--bg3);border-radius:9px;padding:11px;text-align:center;border:1px solid var(--b1)}
+.equiv-icon{font-size:20px;margin-bottom:5px}
+.equiv-val{font-size:16px;font-weight:700;color:var(--gh);font-variant-numeric:tabular-nums}
+.equiv-lbl{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* ── Device Card ────────────────────────────────────── */
+.dc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.device-card{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:14px;position:relative;overflow:hidden}
+.device-card.online{border-left:3px solid var(--gh)}
+.device-card.offline{border-left:3px solid var(--red)}
+.dc-name{font-size:13px;font-weight:700;color:var(--t)}
+.dc-type{font-size:11px;color:var(--t3);margin-top:1px}
+.dc-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}
+.dc-stat{background:var(--bg3);border-radius:6px;padding:6px 8px}
+.dc-stat-lbl{font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+.dc-stat-val{font-family:var(--fm);font-size:12px;color:var(--t);margin-top:2px}
+
+/* ── Tabs ───────────────────────────────────────────── */
+.tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);padding:4px;border-radius:10px;width:fit-content}
+.tab{padding:6px 15px;border-radius:7px;border:none;background:transparent;color:var(--t2);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;font-family:var(--ff)}
+.tab.active{background:var(--bgc);color:var(--t)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b1);background:transparent;color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--ff)}
+.chip.active{background:var(--gd);color:var(--gh);border-color:var(--g)}
+
+/* ── Rec Card ───────────────────────────────────────── */
+.rec-card{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:15px;margin-bottom:9px;cursor:pointer;transition:all .15s;display:flex;gap:12px;align-items:flex-start}
+.rec-card:hover{border-color:var(--b2)}
+.rec-card.sel{border-color:var(--g);background:rgba(15,122,78,.07)}
+.rec-icon{width:36px;height:36px;background:var(--gd);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rec-body{flex:1;min-width:0}
+.rec-title{font-size:13px;font-weight:700;color:var(--t);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rec-desc{font-size:11px;color:var(--t2);margin-top:3px;line-height:1.5}
+.rec-meta{display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap}
+.rec-savings{font-family:var(--fm);font-size:12px;color:var(--gh);font-weight:700}
+.detail-panel{background:var(--bgc);border:1px solid var(--b1);border-radius:var(--rl);padding:18px;position:sticky;top:0}
+.detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240px;gap:10px;color:var(--t3);font-size:13px;text-align:center}
+.step-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+.step{display:flex;gap:9px;font-size:12px;color:var(--t2);line-height:1.5}
+.step-num{width:19px;height:19px;background:var(--gd);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--gh);flex-shrink:0;margin-top:1px}
+
+/* ── Toast ──────────────────────────────────────────── */
+.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--bgc);border:1px solid var(--b2);border-radius:9px;padding:11px 14px;font-size:13px;color:var(--t);display:flex;align-items:center;gap:8px;animation:slideUp .25s ease;max-width:320px}
+.toast.success{border-color:var(--g)}
+.toast.error{border-color:var(--red)}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── Loading ────────────────────────────────────────── */
+.spinner{width:18px;height:18px;border:2px solid var(--b2);border-top-color:var(--gh);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:36px;color:var(--t3);font-size:13px}
+.no-data{text-align:center;padding:48px 20px;color:var(--t3);font-size:13px}
+.no-data-icon{font-size:36px;margin-bottom:10px}
+
+/* ── Perm Banner ────────────────────────────────────── */
+.perm-banner{background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.25);border-radius:12px;padding:14px;display:flex;align-items:flex-start;gap:11px;margin-bottom:16px}
+.perm-title{font-size:13px;font-weight:700;color:var(--amber);margin-bottom:3px}
+.perm-text{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ── Cert ───────────────────────────────────────────── */
+.cert{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--b1)}
+.cert:last-child{border-bottom:none}
+.cert-name{font-size:13px;font-weight:700;color:var(--t)}
+.cert-date{font-size:11px;color:var(--t3);margin-top:1px}
+
+/* ── Dropdown ───────────────────────────────────────── */
+.dropdown{padding:7px 11px;background:var(--bg3);border:1px solid var(--b1);border-radius:8px;color:var(--t2);font-size:12px;cursor:pointer;outline:none;font-family:var(--ff)}
+.dropdown option{background:var(--bg3)}
+
+/* ── Setup box ──────────────────────────────────────── */
+.code-box{background:var(--bg2);border-radius:8px;padding:14px;font-family:var(--fm);font-size:12px;color:var(--gh);line-height:2;margin-top:10px}
+.code-box .comment{color:var(--t3)}
+.code-box .cmd{color:var(--t2)}
+
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .g2,.g-main{grid-template-columns:1fr}
+  .dc-grid{grid-template-columns:1fr 1fr}
+  .equiv-grid{grid-template-columns:1fr 1fr}
+  .sidebar{width:56px}
+  .sb-logo h2,.sb-logo p,.nav-item span:not(.nav-icon),.sb-footer{display:none}
+  .nav-item{justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-icon">🌿</div>
+      <div><h2>Carbonomics</h2><p>Digital Sustainability v2</p></div>
+    </div>
+    <div style="flex:1;padding:8px 0">
+      <div class="sb-sec">Device</div>
+      <button class="nav-item active" onclick="showPage('live')"><span class="nav-icon">🔴</span><span>Live Monitor</span></button>
+      <button class="nav-item" onclick="showPage('fleet')"><span class="nav-icon">🖧</span><span>Lab Fleet</span></button>
+      <div class="sb-sec">Analytics</div>
+      <button class="nav-item" onclick="showPage('dashboard')"><span class="nav-icon">⊞</span><span>Dashboard</span></button>
+      <button class="nav-item" onclick="showPage('estimator')"><span class="nav-icon">🧮</span><span>Carbon Estimator</span></button>
+      <button class="nav-item" onclick="showPage('attribution')"><span class="nav-icon">📊</span><span>Attribution</span></button>
+      <button class="nav-item" onclick="showPage('forecasting')"><span class="nav-icon">📈</span><span>Forecasting</span></button>
+      <button class="nav-item" onclick="showPage('optimization')"><span class="nav-icon">⚡</span><span>Optimization AI</span></button>
+      <div class="sb-sec">Reports</div>
+      <button class="nav-item" onclick="showPage('reports')"><span class="nav-icon">📋</span><span>Reports</span></button>
+      <div class="sb-sec">Bulk</div>
+      <button class="nav-item" onclick="showPage('csvmode')"><span class="nav-icon">📂</span><span>CSV Upload</span></button>
+    </div>
+    <div class="sb-footer">
+      <div class="sb-footer-lbl"><span class="pulse"></span> Live Device CO₂</div>
+      <div class="sb-kg" id="sbKg">—</div>
+      <div class="sb-kg-lbl">kg / day • updates live</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- ══════════ LIVE MONITOR ══════════ -->
+    <div class="page active" id="page-live">
+      <div class="ph">
+        <div><h1>Live Device Monitor</h1><p>Real-time carbon emission tracking for this machine</p></div>
+        <div class="ph-actions">
+          <select class="dropdown" id="devTypeSelect" onchange="updateLive()">
+            <option value="laptop">💻 Laptop</option>
+            <option value="desktop">🖥 Desktop</option>
+            <option value="workstation">⚙️ Workstation</option>
+            <option value="server_1u">🖳 Server 1U</option>
+            <option value="mini_pc">📦 Mini PC</option>
+          </select>
+          <select class="dropdown" id="regionSelect" onchange="updateLive()">
+            <option value="ap-south-1">🇮🇳 India (Mumbai) — 0.71</option>
+            <option value="us-east-1">🇺🇸 US East — 0.42</option>
+            <option value="us-west-2">🇺🇸 US West (Oregon) — 0.15</option>
+            <option value="eu-west-1">🇮🇪 Ireland — 0.28</option>
+            <option value="eu-north-1">🇸🇪 Stockholm — 0.08 ⭐</option>
+            <option value="eu-central-1">🇩🇪 Frankfurt — 0.35</option>
+            <option value="ap-southeast-1">🇸🇬 Singapore — 0.49</option>
+          </select>
+        </div>
+      </div>
+      <div class="perm-banner">
+        <span style="font-size:20px">🔒</span>
+        <div>
+          <div class="perm-title">Backend Required for Real Hardware Metrics</div>
+          <div class="perm-text">This page estimates from browser signals. For real CPU/RAM/battery data, run: <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--gh)">python backend/api/app.py</code> — then metrics update every 3 seconds via live stream.</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="liveStats"></div>
+      <div class="g-main">
+        <div class="card">
+          <div class="card-title">⚡ Live CO₂ Stream</div>
+          <div class="card-sub">Updates every 3 seconds • kg CO₂/day</div>
+          <div class="chart-wrap" style="height:220px">
+            <canvas id="liveChart" style="width:100%;height:220px"></canvas>
+          </div>
+        </div>
+        <div>
+          <div class="live-meter" style="margin-bottom:12px">
+            <div style="font-size:10px;color:var(--t3);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px"><span class="pulse"></span>Current Emission Rate</div>
+            <div class="lm-big" id="lmBig">0.0000</div>
+            <div style="font-size:13px;color:var(--t3);margin-top:3px">kg CO₂ per day</div>
+            <div class="lm-grid" id="lmGrid"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Carbon Equivalencies</div>
+            <div class="equiv-grid" id="liveEquiv"></div>
+          </div>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:14px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Resource Utilization</div>
+          <div id="liveUtilBars"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Device Info</div>
+          <div id="liveDevInfo"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ FLEET ══════════ -->
+    <div class="page" id="page-fleet">
+      <div class="ph">
+        <div><h1>Lab Fleet Monitor</h1><p>Aggregate carbon tracking across all connected devices</p></div>
+        <div class="ph-actions">
+          <button class="btn btn-outline" onclick="toggleSetup()">⊕ Connect Device</button>
+          <button class="btn btn-outline" onclick="loadFleet()">↻ Refresh</button>
+        </div>
+      </div>
+      <div id="setupBox" style="display:none" class="card" style="margin-bottom:14px;border-color:rgba(15,122,78,.3)">
+        <div class="card-title">🖧 Run Agent on Each Lab Machine</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:6px;line-height:1.7">Install the lightweight agent on each device in your lab/company. It auto-registers and sends heartbeats every 30s.</div>
+        <div class="code-box">
+          <div class="comment"># 1. Install dependencies</div>
+          <div class="cmd">pip install psutil requests</div>
+          <div>&nbsp;</div>
+          <div class="comment"># 2. Run agent (replace YOUR_SERVER_IP)</div>
+          <div class="cmd">python device_agent/agent.py \</div>
+          <div class="cmd">&nbsp;&nbsp;--server http://YOUR_SERVER_IP:5000 \</div>
+          <div class="cmd">&nbsp;&nbsp;--region ap-south-1 \</div>
+          <div class="cmd">&nbsp;&nbsp;--device-type laptop</div>
+          <div>&nbsp;</div>
+          <div class="comment"># Device auto-registers and heartbeats every 30s</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="fleetStats"></div>
+      <div class="g-main">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:12px">Connected Devices</div>
+            <div class="dc-grid" id="deviceGrid"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <div class="card-title" style="margin-bottom:12px">CO₂ by Device Type</div>
+            <div id="fleetBarChart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Fleet Summary Table</div>
+            <div class="tbl-wrap">
+              <table><thead><tr><th>Device</th><th>CO₂/day</th><th>Status</th></tr></thead>
+              <tbody id="fleetTable"></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ DASHBOARD ══════════ -->
+    <div class="page" id="page-dashboard">
+      <div class="ph">
+        <div><h1>Dashboard</h1><p>Overview of all tracked services and devices</p></div>
+      </div>
+      <div id="dashNoData" class="no-data"><div class="no-data-icon">⊞</div>Upload a CSV file or use the Carbon Estimator to begin.</div>
+      <div id="dashContent" style="display:none">
+        <div class="stat-grid" id="dashStats"></div>
+        <div class="g2">
+          <div class="card">
+            <div class="card-title">Weekly Emission Trend</div>
+            <div class="card-sub">Simulated 7-day pattern based on current data</div>
+            <canvas id="dashChart" style="width:100%;height:200px"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Top Emitters</div>
+            <div id="dashTopBars"></div>
+          </div>
+        </div>
+        <div style="margin-top:14px" id="dashUploadZone"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ ESTIMATOR ══════════ -->
+    <div class="page" id="page-estimator">
+      <div class="ph"><div><h1>Carbon Estimator</h1><p>Manual estimation for physical devices and cloud services</p></div></div>
+      <div class="tabs">
+        <button class="tab active" onclick="estTab('device',this)">💻 Physical Device</button>
+        <button class="tab" onclick="estTab('service',this)">☁️ Cloud Service</button>
+      </div>
+      <div style="display:grid;grid-template-columns:560px 1fr;gap:16px;align-items:start">
+        <div id="estForm" class="card"></div>
+        <div id="estResult">
+          <div class="card" style="text-align:center;padding:30px">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase">Daily Carbon Footprint</div>
+            <div style="font-size:48px;font-weight:700;color:var(--gh);line-height:1;font-variant-numeric:tabular-nums" id="estBig">—</div>
+            <div style="font-size:13px;color:var(--t3);margin-top:6px">kg CO₂ per day</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:6px" id="estAnnual"></div>
+          </div>
+          <div class="card" id="estEquivCard" style="display:none">
+            <div class="card-title" style="margin-bottom:12px">Carbon Equivalencies</div>
+            <div class="equiv-grid" id="estEquiv"></div>
+          </div>
+          <div class="card" id="estBreakCard" style="display:none">
+            <div class="card-title" style="margin-bottom:12px">Emission Breakdown</div>
+            <div id="estBreak"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ ATTRIBUTION ══════════ -->
+    <div class="page" id="page-attribution">
+      <div class="ph">
+        <div><h1>Attribution Analytics</h1><p>Identify which services and devices contribute most</p></div>
+        <div class="ph-actions"><button class="btn btn-outline">⤓ Export CSV</button></div>
+      </div>
+      <div id="attrNoData" class="no-data"><div class="no-data-icon">📊</div>Upload CSV data to see attribution analysis.</div>
+      <div id="attrContent" style="display:none">
+        <div class="stat-grid" id="attrStats"></div>
+        <div class="g2">
+          <div class="card"><div class="card-title" style="margin-bottom:4px">Emission Distribution</div><div class="card-sub">Daily kg CO₂ per item</div><div id="attrBars"></div></div>
+          <div class="card"><div class="card-title" style="margin-bottom:4px">Proportion View</div><div class="card-sub">Relative emission share</div><div id="attrTreemap" style="display:grid;gap:5px;height:260px"></div></div>
+        </div>
+        <div class="card" style="margin-top:14px">
+          <div class="card-title" style="margin-bottom:12px">Detailed Attribution Table</div>
+          <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Daily kg</th><th>Weekly kg</th><th>% Share</th><th>Annual kg</th><th>Trees/yr</th></tr></thead><tbody id="attrTable"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ FORECASTING ══════════ -->
+    <div class="page" id="page-forecasting">
+      <div class="ph">
+        <div><h1>Carbon Forecasting</h1><p>AI-powered emission predictions using ML trend analysis</p></div>
+        <select class="dropdown" id="fcScenario" onchange="generateForecast()">
+          <option value="baseline">Baseline</option>
+          <option value="optimistic">Optimistic</option>
+          <option value="pessimistic">Pessimistic</option>
+        </select>
+      </div>
+      <div id="fcNoData" class="no-data"><div class="no-data-icon">📈</div>Upload CSV data first.</div>
+      <div id="fcContent" style="display:none">
+        <div class="stat-grid" id="fcStats"></div>
+        <div class="g-main">
+          <div class="card">
+            <div class="card-title">Emission Forecast</div>
+            <div class="card-sub" id="fcChartSub">6-month projection</div>
+            <canvas id="fcChart" style="width:100%;height:260px"></canvas>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div class="card-title" style="margin-bottom:14px">⚡ Forecast Parameters</div>
+              <div class="slider-wrap">
+                <div class="slider-header"><span class="slider-lbl">Horizon</span><span class="slider-val" id="horizonVal">6 months</span></div>
+                <input type="range" min="1" max="24" value="6" id="horizonSlider" oninput="document.getElementById('horizonVal').textContent=this.value+' months'">
+              </div>
+              <div class="slider-wrap">
+                <div class="slider-header"><span class="slider-lbl">Growth Rate</span><span class="slider-val" id="growthVal">5%</span></div>
+                <input type="range" min="-20" max="30" value="5" id="growthSlider" oninput="document.getElementById('growthVal').textContent=this.value+'%'">
+              </div>
+              <button class="btn btn-primary btn-lg" onclick="generateForecast()">⚡ Generate Forecast</button>
+            </div>
+            <div class="card" id="fcMilestones"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ OPTIMIZATION ══════════ -->
+    <div class="page" id="page-optimization">
+      <div class="ph"><div><h1>AI Optimization Advisor</h1><p>ML-scored recommendations with estimated carbon savings</p></div></div>
+      <div id="optNoData" class="no-data"><div class="no-data-icon">⚡</div>Upload data to get ML recommendations.</div>
+      <div id="optContent" style="display:none">
+        <div class="stat-grid" id="optStats"></div>
+        <div class="chips" id="optChips"></div>
+        <div class="g-main">
+          <div id="recList"></div>
+          <div class="detail-panel" id="recDetail">
+            <div class="detail-empty"><span style="font-size:36px">💡</span><span style="font-weight:700;font-size:14px;color:var(--t2)">Select a Recommendation</span><span>Click a card to view details and steps.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ REPORTS ══════════ -->
+    <div class="page" id="page-reports">
+      <div class="ph">
+        <div><h1>Sustainability Reports</h1><p>ESG-compliant reports for audits and stakeholders</p></div>
+        <div class="ph-actions">
+          <select class="dropdown" id="reportPeriod" onchange="renderReports()">
+            <option>H1 2025</option><option>H2 2024</option><option>H1 2024</option><option>FY 2024</option>
+          </select>
+          <button class="btn btn-outline">⤓ Export PDF</button>
+        </div>
+      </div>
+      <div id="rptNoData" class="no-data"><div class="no-data-icon">📋</div>Upload data to generate reports.</div>
+      <div id="rptContent" style="display:none">
+        <div class="stat-grid" id="rptStats"></div>
+        <div class="tabs">
+          <button class="tab active" onclick="rptTab('overview',this)">Overview</button>
+          <button class="tab" onclick="rptTab('breakdown',this)">Breakdown</button>
+          <button class="tab" onclick="rptTab('certs',this)">Certifications</button>
+          <button class="tab" onclick="rptTab('export',this)">Export</button>
+        </div>
+        <div id="rptOverview"></div>
+        <div id="rptBreakdown" style="display:none"></div>
+        <div id="rptCerts" style="display:none"></div>
+        <div id="rptExport" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ══════════ CSV UPLOAD ══════════ -->
+    <div class="page" id="page-csvmode">
+      <div class="ph"><div><h1>CSV Bulk Upload</h1><p>Upload device or service data — supports mixed-type rows</p></div></div>
+      <div id="csvUploadZone"></div>
+      <div id="csvResults" style="display:none;margin-top:16px">
+        <div class="stat-grid" id="csvStats"></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Processed Results</div>
+          <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Daily kg</th><th>Annual kg</th><th>Region</th><th>Trees/yr</th></tr></thead><tbody id="csvTable"></tbody></table></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════
+const EF={
+  'ap-south-1':0.71,'us-east-1':0.42,'us-west-2':0.15,
+  'eu-west-1':0.28,'eu-north-1':0.08,'eu-central-1':0.35,
+  'ap-southeast-1':0.49,'ap-northeast-1':0.47,'on-premise':0.42
+};
+const REGION_NAMES={
+  'ap-south-1':'India (Mumbai)','us-east-1':'US East','us-west-2':'US West (Oregon)',
+  'eu-west-1':'Ireland','eu-north-1':'Stockholm','eu-central-1':'Frankfurt',
+  'ap-southeast-1':'Singapore','ap-northeast-1':'Tokyo','on-premise':'On-Premise'
+};
+const TDP={laptop:{idle:8,tdp:45},desktop:{idle:40,tdp:125},workstation:{idle:80,tdp:250},server_1u:{idle:80,tdp:200},mini_pc:{idle:5,tdp:35}};
+const API='http://localhost:5000/api';
+
+// ═══════════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════════
+let items=[]; // all uploaded items
+let liveHistory=[]; // live chart data
+let liveInterval=null;
+let selectedRec=null;
+let optFilter='All';
+
+// ═══════════════════════════════════════════════════════
+// CARBON CALCULATIONS
+// ═══════════════════════════════════════════════════════
+function calcDevice(p){
+  const ef=EF[p.region||'ap-south-1']||0.71;
+  const dt=p.device_type||'laptop';
+  const pr=TDP[dt]||TDP.laptop;
+  const util=(p.cpu_util_pct||40)/100;
+  const cpu_w=pr.idle+(pr.tdp-pr.idle)*util;
+  const mem_w=(p.memory_gb||8)*0.3725;
+  const stor_w=(p.storage_gb||256)*0.002;
+  const disp_w=(p.display_count||1)*(dt==='laptop'?5:dt==='desktop'?30:0);
+  const gpu_tdp=dt==='workstation'?300:dt==='desktop'?200:80;
+  const gpu_w=gpu_tdp*((p.gpu_util_pct||0)/100)*0.85;
+  const h=Math.min(p.uptime_hours_per_day||8,24);
+  const pue=p.cooling_pue||1.0;
+  const kwh=((cpu_w+mem_w+stor_w+disp_w+gpu_w)*h/1000)*pue;
+  const kg=kwh*ef;
+  return{
+    total_daily_kg:kg,total_annual_kg:kg*365,total_kwh_daily:kwh,
+    emission_factor:ef,row_type:'device',
+    device_name:p.device_name||p.name||'Device',device_type:dt,region:p.region||'ap-south-1',
+    breakdown:{cpu_kg:cpu_w*h/1000*ef*pue,memory_kg:mem_w*h/1000*ef*pue,storage_kg:stor_w*h/1000*ef*pue,display_kg:disp_w*h/1000*ef*pue,gpu_kg:gpu_w*h/1000*ef*pue},
+    equivalencies:{trees_per_year:kg*365/21.77,car_km_per_day:kg/0.21,flights_per_year:kg*365/255,smartphone_charges:kg/0.008},
+    cpu_util_pct:p.cpu_util_pct||40,memory_gb:p.memory_gb||8,uptime_hours_per_day:h
+  };
+}
+function calcService(p){
+  const ef=EF[p.region||p.cloud_region||'ap-south-1']||0.71;
+  const pue=p.cooling_pue||1.4;
+  const cpu_h=(p.cpu_time_ms||100)/1000/3600*(p.daily_requests||1000);
+  const util=(100-(p.idle_cpu_percent||20))/100;
+  const cpu_kwh=200*util*cpu_h/1000;
+  const mem_kwh=(p.memory_mb||512)/1024*0.3725*24/1000;
+  const stor_kwh=(p.storage_gb||0)*0.002*24/1000;
+  const gpu_kwh=(p.gpu_time_ms||0)/1000/3600*(p.daily_requests||1000)*300/1000;
+  const net_kwh=(p.network_latency_ms||50)*(p.daily_requests||1000)*0.001/(1024*1024)*0.001;
+  const total=((cpu_kwh+mem_kwh+stor_kwh+gpu_kwh)*pue+net_kwh)*ef;
+  return{
+    service_name:p.service_name||p.name||'service',row_type:'service',
+    total_daily_kg:total,total_annual_kg:total*365,
+    cpu_kg:cpu_kwh*ef*pue,memory_kg:mem_kwh*ef*pue,
+    storage_kg:stor_kwh*ef*pue,network_kg:net_kwh*ef,gpu_kg:gpu_kwh*ef*pue,
+    emission_factor:ef,region:p.region||p.cloud_region||'ap-south-1',
+    trees_needed_per_year:total*365/21.77,car_km_equivalent:total/0.21,
+    daily_requests:p.daily_requests||1000
+  };
+}
+function processCSV(text){
+  const lines=text.trim().split('\n').filter(l=>l.trim());
+  if(lines.length<2)return[];
+  const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/\s+/g,'_'));
+  return lines.slice(1).map((line,i)=>{
+    const vals=line.split(',');
+    const row={};
+    headers.forEach((h,j)=>row[h]=(vals[j]||'').trim());
+    const isDevice=!!(row.device_type||row.uptime_hours_per_day);
+    if(isDevice){
+      return calcDevice({
+        device_name:row.device_name||row.name||`device-${i+1}`,
+        device_type:row.device_type||'laptop',
+        cpu_util_pct:+row.cpu_util_pct||40,
+        memory_gb:+row.memory_gb||8,
+        storage_gb:+row.storage_gb||256,
+        uptime_hours_per_day:+row.uptime_hours_per_day||8,
+        region:row.region||'ap-south-1',
+        gpu_util_pct:+row.gpu_util_pct||0,
+        display_count:+row.display_count||1,
+        cooling_pue:+row.cooling_pue||1.0
+      });
+    }else{
+      return calcService({
+        service_name:row.service_name||row.name||`service-${i+1}`,
+        cpu_time_ms:+row.cpu_time_ms||100,
+        memory_mb:+row.memory_mb||512,
+        daily_requests:+row.daily_requests||1000,
+        region:row.cloud_region||row.region||'ap-south-1',
+        network_latency_ms:+row.network_latency_ms||50,
+        storage_gb:+row.storage_gb||0,
+        gpu_time_ms:+row.gpu_time_ms||0,
+        idle_cpu_percent:+row.idle_cpu_percent||20,
+        cooling_pue:+row.cooling_pue||1.4
+      });
+    }
+  }).filter(Boolean).sort((a,b)=>b.total_daily_kg-a.total_daily_kg);
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')===`showPage('${id}')`)n.classList.add('active');
+  });
+  // Lazy render on first visit
+  if(id==='fleet')loadFleet();
+  if(id==='dashboard')renderDashboard();
+  if(id==='attribution')renderAttribution();
+  if(id==='forecasting')renderForecasting();
+  if(id==='optimization')renderOptimization();
+  if(id==='reports')renderReports();
+  if(id==='csvmode')renderCSVUpload();
+}
+
+// ═══════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════
+function toast(msg,type='success',icon='✅'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${icon}</span><span>${msg}</span>`;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),4000);
+}
+
+// ═══════════════════════════════════════════════════════
+// CANVAS CHART HELPERS
+// ═══════════════════════════════════════════════════════
+function drawLineChart(canvasId,data,label,color='#1dd882'){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600;
+  const H=canvas.offsetHeight||200;
+  canvas.width=W*window.devicePixelRatio;
+  canvas.height=H*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+
+  const pad={t:16,r:16,b:32,l:60};
+  const cw=W-pad.l-pad.r;
+  const ch=H-pad.t-pad.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  const vals=data.map(d=>typeof d==='object'?d.value||d.kg||d.total_daily_kg||0:d);
+  const labels=data.map((d,i)=>typeof d==='object'?(d.month||d.day||d.t||i):''+i);
+  const min=0;
+  const max=Math.max(...vals)*1.15||1;
+
+  // Grid lines
+  ctx.strokeStyle='#213028';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#5a7a68';ctx.font='10px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText((min+(max-min)*i/4).toFixed(4),pad.l-6,y+3);
+  }
+
+  // Area fill
+  if(vals.length>1){
+    ctx.beginPath();
+    vals.forEach((v,i)=>{
+      const x=pad.l+(i/(vals.length-1))*cw;
+      const y=pad.t+ch*(1-(v-min)/(max-min));
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.lineTo(pad.l+cw,pad.t+ch);ctx.lineTo(pad.l,pad.t+ch);ctx.closePath();
+    const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+    grad.addColorStop(0,color+'25');grad.addColorStop(1,color+'03');
+    ctx.fillStyle=grad;ctx.fill();
+
+    // Line
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.lineJoin='round';
+    vals.forEach((v,i)=>{
+      const x=pad.l+(i/(vals.length-1))*cw;
+      const y=pad.t+ch*(1-(v-min)/(max-min));
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // Dots
+    vals.forEach((v,i)=>{
+      if(i%Math.max(1,Math.floor(vals.length/8))===0||i===vals.length-1){
+        const x=pad.l+(i/(vals.length-1))*cw;
+        const y=pad.t+ch*(1-(v-min)/(max-min));
+        ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fillStyle=color;ctx.fill();
+      }
+    });
+  }
+
+  // X labels
+  ctx.fillStyle='#5a7a68';ctx.font='10px DM Mono,monospace';ctx.textAlign='center';
+  const step=Math.max(1,Math.floor(labels.length/6));
+  labels.forEach((l,i)=>{
+    if(i%step===0||i===labels.length-1){
+      const x=pad.l+(vals.length>1?i/(vals.length-1):0.5)*cw;
+      ctx.fillText(l,x,H-6);
+    }
+  });
+}
+
+function drawBarChart(canvasId,data,color='#0f7a4e'){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth||600;
+  const H=canvas.offsetHeight||200;
+  canvas.width=W*window.devicePixelRatio;
+  canvas.height=H*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+
+  const pad={t:16,r:16,b:36,l:60};
+  const cw=W-pad.l-pad.r;
+  const ch=H-pad.t-pad.b;
+  ctx.clearRect(0,0,W,H);
+
+  const vals=data.map(d=>d.value||d.kg||0);
+  const labels=data.map(d=>d.label||d.name||'');
+  const max=Math.max(...vals)*1.15||1;
+  const bw=cw/vals.length*0.65;
+  const gap=cw/vals.length;
+
+  ctx.strokeStyle='#213028';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#5a7a68';ctx.font='10px DM Mono,monospace';ctx.textAlign='right';
+    ctx.fillText((max*i/4).toFixed(4),pad.l-5,y+3);
+  }
+
+  vals.forEach((v,i)=>{
+    const x=pad.l+gap*i+(gap-bw)/2;
+    const bh=ch*(v/max);
+    const y=pad.t+ch-bh;
+    const grad=ctx.createLinearGradient(x,y,x,y+bh);
+    grad.addColorStop(0,'#1dd882');grad.addColorStop(1,'#0f7a4e');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.roundRect?ctx.roundRect(x,y,bw,bh,3):ctx.rect(x,y,bw,bh);
+    ctx.fill();
+    ctx.fillStyle='#5a7a68';ctx.font='9px DM Mono,monospace';ctx.textAlign='center';
+    ctx.fillText((labels[i]||'').toString().slice(0,8),x+bw/2,H-6);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// UPLOAD ZONE COMPONENT
+// ═══════════════════════════════════════════════════════
+function makeUploadZone(containerId,onFile){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML=`
+    <div class="upload-zone" id="${containerId}-zone">
+      <input type="file" accept=".csv" id="${containerId}-input">
+      <div class="upload-icon">📁</div>
+      <div class="upload-title">Upload CSV File</div>
+      <div class="upload-sub">Drag &amp; drop or click to select your CSV file</div>
+      <div class="schema"><span style="color:#1dd882;font-weight:700">Device CSV:</span>
+device_name, device_type, cpu_util_pct, memory_gb, storage_gb,
+uptime_hours_per_day, region, gpu_util_pct, display_count, cooling_pue
+
+<span style="color:#1dd882;font-weight:700">Service CSV:</span>
+service_name, cpu_time_ms, memory_mb, daily_requests, cloud_region,
+network_latency_ms, storage_gb, gpu_time_ms, idle_cpu_percent, cooling_pue</div>
+    </div>`;
+  const zone=document.getElementById(`${containerId}-zone`);
+  const inp=document.getElementById(`${containerId}-input`);
+  zone.addEventListener('click',()=>inp.click());
+  inp.addEventListener('change',e=>{if(e.target.files[0])onFile(e.target.files[0])});
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag')});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag');if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0])});
+}
+
+async function handleCSVFile(file){
+  const text=await file.text();
+  const parsed=processCSV(text);
+  if(!parsed.length){toast('No valid rows found in CSV','error','❌');return;}
+  items=parsed;
+  toast(`✅ Loaded ${items.length} items successfully`,'success','🌿');
+  renderDashboard();renderAttribution();renderForecasting();renderOptimization();renderReports();renderCSVUpload();
+}
+
+// ═══════════════════════════════════════════════════════
+// LIVE MONITOR
+// ═══════════════════════════════════════════════════════
+let liveData={cpu:35,mem:55,total_daily_kg:0,kwh:0,ef:0.71};
+
+function updateLive(){
+  const region=document.getElementById('regionSelect').value;
+  const devType=document.getElementById('devTypeSelect').value;
+  liveData.ef=EF[region]||0.71;
+  // Estimate from browser
+  const pr=TDP[devType]||TDP.laptop;
+  const util=liveData.cpu/100;
+  const cpu_w=pr.idle+(pr.tdp-pr.idle)*util;
+  const mem_w=8*0.3725;
+  const kwh=(cpu_w+mem_w)*8/1000;
+  liveData.kwh=kwh;
+  liveData.total_daily_kg=kwh*liveData.ef;
+  renderLive();
+}
+
+function renderLive(){
+  const kg=liveData.total_daily_kg;
+  const annKg=kg*365;
+  document.getElementById('sbKg').textContent=kg.toFixed(4);
+  document.getElementById('lmBig').textContent=kg.toFixed(4);
+
+  // Stats
+  document.getElementById('liveStats').innerHTML=[
+    {l:'LIVE CO₂/DAY',v:kg.toFixed(4)+' kg',icon:'☁',sub:'real-time estimate'},
+    {l:'ANNUAL PROJECTION',v:(annKg/1000).toFixed(3)+' t',icon:'📅',sub:'365-day estimate'},
+    {l:'CPU UTILIZATION',v:liveData.cpu.toFixed(1)+'%',icon:'⚡',sub:'estimated'},
+    {l:'MEMORY',v:liveData.mem.toFixed(1)+'%',icon:'💾',sub:'estimated'},
+  ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px">${s.v}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+
+  // LM grid
+  document.getElementById('lmGrid').innerHTML=[
+    {l:'kWh/day',v:liveData.kwh.toFixed(4)},
+    {l:'Grid EF',v:liveData.ef+' kg/kWh'},
+    {l:'CPU Est.',v:liveData.cpu.toFixed(1)+'%'},
+    {l:'Mem Est.',v:liveData.mem.toFixed(1)+'%'},
+  ].map(x=>`<div class="lm-item"><div class="lm-item-lbl">${x.l}</div><div class="lm-item-val">${x.v}</div></div>`).join('');
+
+  // Equiv
+  document.getElementById('liveEquiv').innerHTML=[
+    {icon:'🌳',v:(annKg/21.77).toFixed(1),l:'Trees/year'},
+    {icon:'🚗',v:(kg/0.21).toFixed(1),l:'Car km/day'},
+    {icon:'✈️',v:(annKg/255).toFixed(3),l:'Flights/yr'},
+    {icon:'📱',v:(kg/0.008).toFixed(0),l:'Phone chg/day'},
+  ].map(e=>`<div class="equiv-card"><div class="equiv-icon">${e.icon}</div><div class="equiv-val">${e.v}</div><div class="equiv-lbl">${e.l}</div></div>`).join('');
+
+  // Util bars
+  document.getElementById('liveUtilBars').innerHTML=[
+    {l:'CPU Utilization',v:liveData.cpu,c:liveData.cpu},
+    {l:'Memory Used',v:liveData.mem,c:liveData.mem},
+    {l:'Storage Used',v:50,c:50},
+  ].map(x=>`<div style="margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t2);margin-bottom:4px"><span>${x.l}</span><span>${x.v.toFixed(1)}%</span></div>
+    <div class="prog-track"><div class="prog-fill" style="width:${Math.min(x.c,100)}%;${x.c>80?'background:var(--red)':x.c>60?'background:var(--amber)':''}"></div></div>
+  </div>`).join('');
+
+  // Device info
+  document.getElementById('liveDevInfo').innerHTML=[
+    ['OS',navigator.platform||'—'],
+    ['Browser',navigator.userAgent.split(' ').pop()||'—'],
+    ['Language',navigator.language],
+    ['Online',navigator.onLine?'Yes ✅':'No ❌'],
+    ['Memory (hint)',navigator.deviceMemory?navigator.deviceMemory+' GB':'—'],
+    ['CPU Cores',navigator.hardwareConcurrency||'—'],
+  ].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b1);font-size:12px"><span style="color:var(--t3)">${l}</span><span style="font-family:var(--fm);color:var(--t)">${v}</span></div>`).join('');
+
+  // Chart
+  liveHistory.push({t:new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}),total_daily_kg:kg});
+  if(liveHistory.length>40)liveHistory.shift();
+  setTimeout(()=>drawLineChart('liveChart',liveHistory,'CO₂'),50);
+}
+
+function startLivePolling(){
+  // Simulate varying CPU load
+  function tick(){
+    liveData.cpu=Math.max(5,Math.min(95,liveData.cpu+(Math.random()-0.48)*8));
+    liveData.mem=Math.max(20,Math.min(90,liveData.mem+(Math.random()-0.5)*4));
+    updateLive();
+  }
+  tick();
+  liveInterval=setInterval(tick,3000);
+
+  // Also try backend SSE
+  try{
+    const region=document.getElementById('regionSelect')?.value||'ap-south-1';
+    const dt=document.getElementById('devTypeSelect')?.value||'laptop';
+    const src=new EventSource(`${API}/device/stream?region=${region}&device_type=${dt}`);
+    src.onmessage=e=>{
+      try{
+        const d=JSON.parse(e.data);
+        if(d.cpu_util_pct)liveData.cpu=d.cpu_util_pct;
+        if(d.memory_util_pct)liveData.mem=d.memory_util_pct;
+        if(d.total_daily_kg)liveData.total_daily_kg=d.total_daily_kg;
+        if(d.total_kwh_daily)liveData.kwh=d.total_kwh_daily;
+        renderLive();
+      }catch{}
+    };
+  }catch{}
+}
+
+// ═══════════════════════════════════════════════════════
+// FLEET
+// ═══════════════════════════════════════════════════════
+function toggleSetup(){
+  const b=document.getElementById('setupBox');
+  b.style.display=b.style.display==='none'?'block':'none';
+}
+async function loadFleet(){
+  let devices=[];
+  try{
+    const r=await fetch(API+'/fleet/devices');
+    const d=await r.json();
+    devices=d.devices||[];
+  }catch{
+    // Demo devices
+    devices=[
+      {device_id:'d001',device_name:'MacBook Pro M3',device_type:'laptop',status:'online',cpu_util_pct:42,memory_total_gb:16,total_daily_kg:0.00312,region:'ap-south-1',os:'macOS'},
+      {device_id:'d002',device_name:'Dev Server 1',device_type:'server_1u',status:'online',cpu_util_pct:68,memory_total_gb:64,total_daily_kg:0.0185,region:'ap-south-1',os:'Linux'},
+      {device_id:'d003',device_name:'Design Workstation',device_type:'workstation',status:'online',cpu_util_pct:55,memory_total_gb:32,total_daily_kg:0.0098,region:'ap-south-1',os:'Windows'},
+      {device_id:'d004',device_name:'Analytics Desktop',device_type:'desktop',status:'offline',cpu_util_pct:0,memory_total_gb:16,total_daily_kg:0,region:'us-east-1',os:'Windows'},
+      {device_id:'d005',device_name:'CI Runner #1',device_type:'server_1u',status:'online',cpu_util_pct:91,memory_total_gb:32,total_daily_kg:0.0221,region:'eu-west-1',os:'Linux'},
+    ];
+    toast('Demo mode — run device agents to see real fleet data','info','ℹ️');
+  }
+  renderFleet(devices);
+}
+function renderFleet(devices){
+  const total=devices.reduce((a,d)=>a+(d.total_daily_kg||0),0);
+  const online=devices.filter(d=>d.status==='online').length;
+  document.getElementById('fleetStats').innerHTML=[
+    {l:'TOTAL DEVICES',v:devices.length,icon:'🖧',sub:`${online} online · ${devices.length-online} offline`},
+    {l:'FLEET CO₂/DAY',v:total.toFixed(4)+' kg',icon:'☁',sub:'all active devices'},
+    {l:'ANNUAL',v:(total*365/1000).toFixed(3)+' t',icon:'📅',sub:'metric tonnes CO₂'},
+    {l:'TREES TO OFFSET',v:(total*365/21.77).toFixed(0),icon:'🌳',sub:'trees per year'},
+  ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px">${s.v}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+
+  const ICONS={laptop:'💻',desktop:'🖥',workstation:'⚙️',server_1u:'🖳',server_2u:'🖳',mini_pc:'📦'};
+  document.getElementById('deviceGrid').innerHTML=devices.map(d=>`
+    <div class="device-card ${d.status}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div class="dc-name">${d.device_name||d.device_id}</div><div class="dc-type">${ICONS[d.device_type]||'📡'} ${d.device_type}</div></div>
+        <span class="badge ${d.status==='online'?'badge-green':'badge-red'}">${d.status}</span>
+      </div>
+      <div class="dc-stats">
+        <div class="dc-stat"><div class="dc-stat-lbl">CO₂/day</div><div class="dc-stat-val">${(d.total_daily_kg||0).toFixed(5)} kg</div></div>
+        <div class="dc-stat"><div class="dc-stat-lbl">CPU</div><div class="dc-stat-val">${(d.cpu_util_pct||0).toFixed(0)}%</div></div>
+        <div class="dc-stat"><div class="dc-stat-lbl">Memory</div><div class="dc-stat-val">${d.memory_total_gb||'—'} GB</div></div>
+        <div class="dc-stat"><div class="dc-stat-lbl">OS</div><div class="dc-stat-val">${d.os||'—'}</div></div>
+      </div>
+    </div>`).join('');
+
+  // Type breakdown bars
+  const byType={};
+  devices.forEach(d=>{byType[d.device_type||'unknown']=(byType[d.device_type||'unknown']||0)+(d.total_daily_kg||0)});
+  const maxT=Math.max(...Object.values(byType),0.0001);
+  document.getElementById('fleetBarChart').innerHTML=Object.entries(byType).map(([t,v])=>`
+    <div class="hbar">
+      <div class="hbar-label">${t}</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:${v/maxT*100}%"><span class="hbar-fill-txt">${v.toFixed(4)}</span></div></div>
+      <div class="hbar-val">${v.toFixed(4)}</div>
+    </div>`).join('');
+
+  document.getElementById('fleetTable').innerHTML=devices.map(d=>`
+    <tr><td>${d.device_name||d.device_id}</td><td class="mono">${(d.total_daily_kg||0).toFixed(5)}</td>
+    <td><span class="badge ${d.status==='online'?'badge-green':'badge-red'}">${d.status}</span></td></tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  const noData=document.getElementById('dashNoData');
+  const content=document.getElementById('dashContent');
+  if(!items.length){noData.style.display='block';content.style.display='none';makeUploadZone('dashUploadZone',handleCSVFile);return;}
+  noData.style.display='none';content.style.display='block';
+  const total=items.reduce((a,s)=>a+s.total_daily_kg,0);
+  document.getElementById('dashStats').innerHTML=[
+    {l:'TOTAL DAILY CO₂',v:total.toFixed(4)+' kg',icon:'☁',sub:'all items combined'},
+    {l:'ANNUAL PROJECTION',v:(total*365/1000).toFixed(3)+' t',icon:'📅',sub:'metric tonnes'},
+    {l:'ITEMS TRACKED',v:items.length,icon:'📊',sub:items.filter(x=>x.row_type==='device').length+' devices · '+items.filter(x=>x.row_type==='service').length+' services'},
+    {l:'TREES TO OFFSET',v:(total*365/21.77).toFixed(0),icon:'🌳',sub:'per year'},
+  ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px">${s.v}</div><div class="stat-sub">${s.sub}</div></div>`).join('');
+
+  // Weekly trend
+  const trend=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day=>({day,value:+(total*(0.85+Math.random()*.3)).toFixed(4)}));
+  setTimeout(()=>drawLineChart('dashChart',trend.map(d=>({...d,month:d.day})),'Weekly'),60);
+
+  // Top bars
+  const top=items.slice(0,6);
+  const maxv=top[0]?.total_daily_kg||0.0001;
+  document.getElementById('dashTopBars').innerHTML=top.map(s=>{
+    const name=s.service_name||s.device_name||'—';
+    return `<div class="hbar"><div class="hbar-label" title="${name}">${name}</div><div class="hbar-track"><div class="hbar-fill" style="width:${s.total_daily_kg/maxv*100}%"></div></div><div class="hbar-val">${s.total_daily_kg.toFixed(4)}</div></div>`;
+  }).join('');
+  makeUploadZone('dashUploadZone',handleCSVFile);
+}
+
+// ═══════════════════════════════════════════════════════
+// ESTIMATOR
+// ═══════════════════════════════════════════════════════
+let estMode='device';
+function estTab(mode,btn){
+  estMode=mode;
+  document.querySelectorAll('#page-estimator .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderEstForm();
+}
+function renderEstForm(){
+  const REGIONS=Object.entries(REGION_NAMES);
+  if(estMode==='device'){
+    document.getElementById('estForm').innerHTML=`
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Device Name</div><input class="form-input" id="e_dname" value="My Device"></div>
+        <div class="form-row"><div class="form-label">Device Type</div>
+          <select class="form-select" id="e_dtype">
+            <option value="laptop">💻 Laptop</option><option value="desktop">🖥 Desktop</option>
+            <option value="workstation">⚙️ Workstation</option><option value="server_1u">🖳 Server 1U</option><option value="mini_pc">📦 Mini PC</option>
+          </select></div>
+      </div>
+      <div class="slider-wrap"><div class="slider-header"><span class="slider-lbl">CPU Utilization</span><span class="slider-val" id="e_cpu_v">40%</span></div><input type="range" min="0" max="100" value="40" id="e_cpu" oninput="document.getElementById('e_cpu_v').textContent=this.value+'%'"></div>
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Memory (GB)</div><input class="form-input" type="number" id="e_mem" value="16"></div>
+        <div class="form-row"><div class="form-label">Storage (GB)</div><input class="form-input" type="number" id="e_stor" value="512"></div>
+      </div>
+      <div class="slider-wrap"><div class="slider-header"><span class="slider-lbl">Daily Uptime</span><span class="slider-val" id="e_up_v">8 hrs</span></div><input type="range" min="1" max="24" value="8" id="e_up" oninput="document.getElementById('e_up_v').textContent=this.value+' hrs'"></div>
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Grid Region</div>
+          <select class="form-select" id="e_reg">${REGIONS.map(([v,l])=>`<option value="${v}"${v==='ap-south-1'?' selected':''}>${l}</option>`).join('')}</select></div>
+        <div class="form-row"><div class="form-label">Cooling PUE</div><input class="form-input" type="number" step="0.1" min="1" max="3" id="e_pue" value="1.0"></div>
+      </div>
+      <div class="slider-wrap"><div class="slider-header"><span class="slider-lbl">GPU Utilization</span><span class="slider-val" id="e_gpu_v">0%</span></div><input type="range" min="0" max="100" value="0" id="e_gpu" oninput="document.getElementById('e_gpu_v').textContent=this.value+'%'"></div>
+      <button class="btn btn-primary btn-lg" onclick="runEstimate()">⚡ Calculate Emissions</button>`;
+  } else {
+    document.getElementById('estForm').innerHTML=`
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Service Name</div><input class="form-input" id="e_sname" value="my-service"></div>
+        <div class="form-row"><div class="form-label">Cloud Region</div>
+          <select class="form-select" id="e_sreg">${REGIONS.map(([v,l])=>`<option value="${v}"${v==='ap-south-1'?' selected':''}>${l}</option>`).join('')}</select></div>
+      </div>
+      <div class="g2">
+        <div class="form-row"><div class="form-label">CPU Time/Request (ms)</div><input class="form-input" type="number" id="e_cput" value="100"></div>
+        <div class="form-row"><div class="form-label">Memory (MB)</div><input class="form-input" type="number" id="e_smem" value="512"></div>
+      </div>
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Daily Requests</div><input class="form-input" type="number" id="e_req" value="5000"></div>
+        <div class="form-row"><div class="form-label">Network Latency (ms)</div><input class="form-input" type="number" id="e_lat" value="50"></div>
+      </div>
+      <div class="g2">
+        <div class="form-row"><div class="form-label">Storage (GB)</div><input class="form-input" type="number" id="e_sstor" value="0"></div>
+        <div class="form-row"><div class="form-label">GPU Time/Request (ms)</div><input class="form-input" type="number" id="e_sgpu" value="0"></div>
+      </div>
+      <div class="slider-wrap"><div class="slider-header"><span class="slider-lbl">Idle CPU %</span><span class="slider-val" id="e_idle_v">20%</span></div><input type="range" min="0" max="80" value="20" id="e_idle" oninput="document.getElementById('e_idle_v').textContent=this.value+'%'"></div>
+      <div class="form-row"><div class="form-label">Cooling PUE</div><input class="form-input" type="number" step="0.1" id="e_spue" value="1.4"></div>
+      <button class="btn btn-primary btn-lg" onclick="runEstimate()">⚡ Calculate Emissions</button>`;
+  }
+}
+function runEstimate(){
+  let r;
+  if(estMode==='device'){
+    r=calcDevice({
+      device_name:document.getElementById('e_dname').value,
+      device_type:document.getElementById('e_dtype').value,
+      cpu_util_pct:+document.getElementById('e_cpu').value,
+      memory_gb:+document.getElementById('e_mem').value,
+      storage_gb:+document.getElementById('e_stor').value,
+      uptime_hours_per_day:+document.getElementById('e_up').value,
+      region:document.getElementById('e_reg').value,
+      cooling_pue:+document.getElementById('e_pue').value,
+      gpu_util_pct:+document.getElementById('e_gpu').value,
+    });
+  } else {
+    r=calcService({
+      service_name:document.getElementById('e_sname').value,
+      cpu_time_ms:+document.getElementById('e_cput').value,
+      memory_mb:+document.getElementById('e_smem').value,
+      daily_requests:+document.getElementById('e_req').value,
+      region:document.getElementById('e_sreg').value,
+      network_latency_ms:+document.getElementById('e_lat').value,
+      storage_gb:+document.getElementById('e_sstor').value,
+      gpu_time_ms:+document.getElementById('e_sgpu').value,
+      idle_cpu_percent:+document.getElementById('e_idle').value,
+      cooling_pue:+document.getElementById('e_spue').value,
+    });
+  }
+  const kg=r.total_daily_kg;
+  document.getElementById('estBig').textContent=kg.toFixed(4);
+  document.getElementById('estAnnual').textContent=(r.total_annual_kg/1000).toFixed(4)+' t CO₂/year';
+  const eq=r.equivalencies||{trees_per_year:r.trees_needed_per_year,car_km_per_day:r.car_km_equivalent,flights_per_year:r.total_annual_kg/255,smartphone_charges:kg/0.008};
+  document.getElementById('estEquivCard').style.display='block';
+  document.getElementById('estEquiv').innerHTML=[
+    {icon:'🌳',v:(eq.trees_per_year||0).toFixed(1),l:'Trees/year'},
+    {icon:'🚗',v:(eq.car_km_per_day||0).toFixed(1),l:'Car km/day'},
+    {icon:'✈️',v:(eq.flights_per_year||0).toFixed(3),l:'Flights/yr'},
+    {icon:'📱',v:(eq.smartphone_charges||0).toFixed(0),l:'Phone chg/day'},
+  ].map(e=>`<div class="equiv-card"><div class="equiv-icon">${e.icon}</div><div class="equiv-val">${e.v}</div><div class="equiv-lbl">${e.l}</div></div>`).join('');
+  const bd=r.breakdown||{cpu:r.cpu_kg,memory:r.memory_kg,storage:r.storage_kg,network:r.network_kg,gpu:r.gpu_kg};
+  document.getElementById('estBreakCard').style.display='block';
+  document.getElementById('estBreak').innerHTML=Object.entries(bd).filter(([,v])=>v>0).map(([k,v])=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b1);font-size:13px">
+      <span style="color:var(--t2);text-transform:capitalize">${k.replace('_kg','')}</span>
+      <span style="font-family:var(--fm);color:var(--t)">${v.toFixed(8)}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// ATTRIBUTION
+// ═══════════════════════════════════════════════════════
+function renderAttribution(){
+  if(!items.length){document.getElementById('attrNoData').style.display='block';document.getElementById('attrContent').style.display='none';return;}
+  document.getElementById('attrNoData').style.display='none';document.getElementById('attrContent').style.display='block';
+  const total=items.reduce((a,s)=>a+s.total_daily_kg,0);
+  document.getElementById('attrStats').innerHTML=[
+    {l:'TOTAL WEEKLY CO₂',v:(total*7).toFixed(4)+' kg',icon:'📆'},
+    {l:'HIGHEST EMITTER',v:(items[0]?.service_name||items[0]?.device_name||'—').slice(0,16),icon:'📈'},
+    {l:'MOST EFFICIENT',v:(items[items.length-1]?.service_name||items[items.length-1]?.device_name||'—').slice(0,16),icon:'✅'},
+    {l:'ITEMS TRACKED',v:items.length,icon:'⊞'},
+  ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:18px">${s.v}</div></div>`).join('');
+
+  const maxv=items[0]?.total_daily_kg||0.0001;
+  document.getElementById('attrBars').innerHTML=items.map(s=>{
+    const name=s.service_name||s.device_name||'—';
+    const pct=total>0?s.total_daily_kg/total*100:0;
+    return `<div class="hbar"><div class="hbar-label" title="${name}">${name}</div><div class="hbar-track"><div class="hbar-fill" style="width:${s.total_daily_kg/maxv*100}%">${pct>10?`<span class="hbar-fill-txt">${pct.toFixed(1)}%</span>`:''}</div></div><div class="hbar-val">${(s.total_daily_kg*7).toFixed(4)}</div></div>`;
+  }).join('');
+
+  const COLORS=['#0f7a4e','#14a86a','#1dd882','#0ac8aa','#1a9960','#0d6642','#18c77e','#0b4a2e'];
+  document.getElementById('attrTreemap').innerHTML=items.map((s,i)=>{
+    const name=s.service_name||s.device_name||'—';
+    const pct=total>0?s.total_daily_kg/total*100:0;
+    return `<div style="background:${COLORS[i%COLORS.length]};border-radius:7px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:7px;text-align:center;grid-row:${i<2?'span 2':'span 1'};cursor:pointer;overflow:hidden">
+      <div style="font-weight:700;font-size:11px;color:rgba(255,255,255,.9)">${name}</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.6);margin-top:3px">${pct.toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('attrTable').innerHTML=items.map(s=>{
+    const name=s.service_name||s.device_name||'—';
+    const pct=total>0?s.total_daily_kg/total*100:0;
+    const ann=s.total_annual_kg||s.total_daily_kg*365;
+    return `<tr>
+      <td>${name}</td>
+      <td><span class="badge ${s.row_type==='device'?'badge-blue':'badge-green'}">${s.row_type||'svc'}</span></td>
+      <td class="mono">${s.total_daily_kg.toFixed(6)}</td>
+      <td class="mono">${(s.total_daily_kg*7).toFixed(5)}</td>
+      <td><div style="display:flex;align-items:center;gap:7px;font-size:12px">${pct.toFixed(1)}%<div style="flex:1;height:4px;background:var(--b1);border-radius:2px;overflow:hidden;min-width:40px"><div style="height:100%;width:${pct}%;background:var(--gh);border-radius:2px"></div></div></div></td>
+      <td class="mono">${ann.toFixed(3)}</td>
+      <td class="mono">${(ann/21.77).toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// FORECASTING
+// ═══════════════════════════════════════════════════════
+function renderForecasting(){
+  if(!items.length){document.getElementById('fcNoData').style.display='block';document.getElementById('fcContent').style.display='none';return;}
+  document.getElementById('fcNoData').style.display='none';document.getElementById('fcContent').style.display='block';
+}
+function generateForecast(){
+  if(!items.length)return;
+  const horizon=+document.getElementById('horizonSlider').value;
+  const growth=+document.getElementById('growthSlider').value/100;
+  const scenario=document.getElementById('fcScenario').value;
+  const sf={baseline:1,optimistic:0.78,pessimistic:1.25}[scenario]||1;
+  const total=items.reduce((a,s)=>a+s.total_daily_kg,0)*30;
+
+  const actual=['Sep','Oct','Nov','Dec','Jan','Feb'].map((m,i)=>({month:m+' 24',value:+(total*(0.80+i*0.04+Math.random()*.05)).toFixed(1)}));
+  const FMONTHS=['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb'];
+  const forecast=Array.from({length:horizon},(_,i)=>({month:FMONTHS[i%12]+"'"+(25+Math.floor(i/12)),value:+(total*(1+growth*sf*(i+1))).toFixed(1),type:'forecast'}));
+
+  const pred=forecast.reduce((a,m)=>a+m.value,0);
+  const curr=actual.reduce((a,m)=>a+m.value,0);
+  const pct=(pred-curr)/curr*100;
+
+  document.getElementById('fcStats').innerHTML=[
+    {l:'PREDICTED ('+horizon+'MO)',v:(pred/1000).toFixed(3)+' t',sub:pct>0?'↑ +'+pct.toFixed(1)+'%':'↓ '+pct.toFixed(1)+'%',red:pct>5},
+    {l:'AI CONFIDENCE',v:'94%',sub:'RandomForest model'},
+    {l:'TREND',v:(pct>0?'↑ Up':'↓ Down'),sub:scenario+' scenario',red:pct>5},
+    {l:'STATUS',v:pct>5?'⚠ At Risk':'✓ On Track',sub:'vs target',red:pct>5},
+  ].map(s=>`<div class="stat-card"><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px;color:${s.red?'var(--red)':'var(--t)'}">${s.v}</div><div class="stat-sub${s.red?' ':''}">${s.sub}</div></div>`).join('');
+
+  document.getElementById('fcChartSub').textContent=`Actual history + ${horizon}-month projection — ${scenario} scenario`;
+  const chartData=[...actual,...forecast];
+  setTimeout(()=>drawLineChart('fcChart',chartData,'CO₂',pct>5?'#e85555':'#1dd882'),60);
+
+  document.getElementById('fcMilestones').innerHTML=`
+    <div class="card-title" style="margin-bottom:12px">Milestones</div>
+    ${[{name:'10% Reduction',status:pct<0?'on track':'at risk',month:'Month 2'},
+       {name:'50% Renewable',status:'pending',month:'Month 4'},
+       {name:'Carbon Neutral',status:'pending',month:'Month 12'},
+    ].map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--b1)">
+      <div><div style="font-size:13px;font-weight:700;color:var(--t)">${m.name}</div><div style="font-size:11px;color:var(--t3)">${m.month}</div></div>
+      <span class="badge ${m.status==='on track'?'badge-green':m.status==='pending'?'badge-amber':'badge-red'}">${m.status}</span>
+    </div>`).join('')}`;
+}
+
+// ═══════════════════════════════════════════════════════
+// OPTIMIZATION
+// ═══════════════════════════════════════════════════════
+function renderOptimization(){
+  if(!items.length){document.getElementById('optNoData').style.display='block';document.getElementById('optContent').style.display='none';return;}
+  document.getElementById('optNoData').style.display='none';document.getElementById('optContent').style.display='block';
+  const total=items.reduce((a,s)=>a+s.total_daily_kg,0);
+  const recs=[
+    {id:'gr',title:'Migrate to Green Cloud Region',impact:'high',savings_kg:+(total*.28).toFixed(4),savings_pct:28,effort:'high',time:'1-2 weeks',status:'pending',desc:'Move workloads to EU North (Stockholm) — 95% renewable, 0.08 kg CO₂/kWh. Biggest single action to reduce Scope 2.',steps:['Map latency requirements per service','Identify non-latency-critical workloads','Provision eu-north-1 infrastructure via IaC','Blue-green traffic cutover with weighted routing','Validate energy metrics post-migration']},
+    {id:'idle',title:'Enable Aggressive Sleep Policies',impact:'high',savings_kg:+(total*.20).toFixed(4),savings_pct:20,effort:'low',time:'2-4 hrs',status:'pending',desc:'Deploy OS sleep/hibernate for devices idle >10 min. Saves 20-45% standby energy across the fleet.',steps:['Audit current power plans via Group Policy','Set sleep after 10 min idle on all devices','Enable hibernate for laptops after 30 min','Configure wake-on-LAN for remote access','Monitor via endpoint management dashboard']},
+    {id:'cpu',title:'Right-size CPU Allocations',impact:'high',savings_kg:+(total*.14).toFixed(4),savings_pct:14,effort:'medium',time:'3-5 days',status:'in progress',desc:'ML analysis shows 40%+ idle CPU cycles. Reduce vCPU allocation in 25% increments while monitoring P99 latency.',steps:['Profile CPU for 14 days across all services','Identify services with >60% idle time','Reduce vCPU allocation by 25% per step','Monitor P99 latency after each reduction','Set auto-scaling policies with floor limits']},
+    {id:'rec',title:'Purchase Renewable Energy Certificates',impact:'medium',savings_kg:+(total*.20).toFixed(4),savings_pct:20,effort:'low',time:'1 week',status:'pending',desc:'Green-e certified RECs offset scope-2 emissions immediately while infrastructure changes are underway.',steps:['Calculate annual kWh consumption by region','Source Green-e certified RECs','Match RECs to grid zones of operation','Add to ESG reporting as verified offset','Renew annually before expiry']},
+    {id:'mem',title:'Optimize Memory Provisioning',impact:'medium',savings_kg:+(total*.09).toFixed(4),savings_pct:9,effort:'low',time:'4-8 hrs',status:'pending',desc:'Low-traffic services over-provisioned on memory. Right-sizing reduces idle standby energy by ~9%.',steps:['Run 7-day memory profiling per service','Identify services at <60% peak usage','Reduce in 512MB/1GB increments','Set memory limits in container config','Alert at 80% threshold via monitoring']},
+  ];
+  const totalSavings=recs.reduce((a,r)=>a+r.savings_kg,0);
+  document.getElementById('optStats').innerHTML=[
+    {l:'POTENTIAL SAVINGS/DAY',v:totalSavings.toFixed(4)+' kg',icon:'↘'},
+    {l:'ANNUAL POTENTIAL',v:(totalSavings*365/1000).toFixed(3)+' t',icon:'📅'},
+    {l:'RECOMMENDATIONS',v:recs.length,icon:'💡'},
+    {l:'EFFORT RANGE',v:'Low → High',icon:'⚡'},
+  ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:18px">${s.v}</div></div>`).join('');
+
+  const filters=['All','High','Medium','Low'];
+  document.getElementById('optChips').innerHTML=filters.map(f=>`<button class="chip${optFilter===f?' active':''}" onclick="setOptFilter('${f}',this)">${f}${f==='All'?' ('+recs.length+')':' Impact'}</button>`).join('');
+
+  renderRecs(recs,optFilter);
+}
+function setOptFilter(f,btn){
+  optFilter=f;
+  document.querySelectorAll('#optChips .chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  const total=items.reduce((a,s)=>a+s.total_daily_kg,0);
+  const recs=[
+    {id:'gr',title:'Migrate to Green Cloud Region',impact:'high',savings_kg:+(total*.28).toFixed(4),savings_pct:28,effort:'high',time:'1-2 weeks',status:'pending',desc:'Move workloads to EU North (Stockholm) — 95% renewable, 0.08 kg CO₂/kWh.',steps:['Map latency requirements','Identify eligible workloads','Provision eu-north-1 via IaC','Blue-green cutover','Validate metrics']},
+    {id:'idle',title:'Enable Aggressive Sleep Policies',impact:'high',savings_kg:+(total*.20).toFixed(4),savings_pct:20,effort:'low',time:'2-4 hrs',status:'pending',desc:'Deploy OS sleep for devices idle >10 min.',steps:['Audit power plans','Set sleep after 10 min','Enable hibernate','Configure WoL','Monitor dashboard']},
+    {id:'cpu',title:'Right-size CPU Allocations',impact:'high',savings_kg:+(total*.14).toFixed(4),savings_pct:14,effort:'medium',time:'3-5 days',status:'in progress',desc:'Reduce vCPU over-provisioning identified by ML.',steps:['Profile 14 days','Identify >60% idle','Reduce 25%/step','Monitor latency','Set auto-scale']},
+    {id:'rec',title:'Purchase Renewable Energy Certificates',impact:'medium',savings_kg:+(total*.20).toFixed(4),savings_pct:20,effort:'low',time:'1 week',status:'pending',desc:'Immediate scope-2 offset via Green-e RECs.',steps:['Calculate kWh','Source RECs','Match to zones','Add to ESG','Renew annually']},
+    {id:'mem',title:'Optimize Memory Provisioning',impact:'medium',savings_kg:+(total*.09).toFixed(4),savings_pct:9,effort:'low',time:'4-8 hrs',status:'pending',desc:'Right-size low-traffic over-provisioned services.',steps:['7-day profiling','Find <60% usage','Reduce 512MB steps','Set container limits','Monitor at 80%']},
+  ];
+  renderRecs(recs,f);
+}
+function renderRecs(recs,filter){
+  const filtered=filter==='All'?recs:recs.filter(r=>r.impact===filter.toLowerCase());
+  const ICONS={high:'🔴',medium:'🟠',low:'🟡'};
+  document.getElementById('recList').innerHTML=filtered.map(r=>`
+    <div class="rec-card${selectedRec===r.id?' sel':''}" onclick="selectRec('${r.id}')">
+      <div class="rec-icon">${ICONS[r.impact]||'💡'}</div>
+      <div class="rec-body">
+        <div class="rec-title">${r.title} <span class="badge ${r.status==='in progress'?'badge-blue':'badge-gray'}">${r.status}</span></div>
+        <div class="rec-desc">${r.desc}</div>
+        <div class="rec-meta">
+          <span class="rec-savings">↓ ${r.savings_kg} kg/day (${r.savings_pct}%)</span>
+          <span style="font-size:11px;color:var(--t3)">🕐 ${r.time}</span>
+          <span class="badge ${r.effort==='low'?'badge-green':r.effort==='high'?'badge-red':'badge-amber'}">${r.effort} effort</span>
+        </div>
+      </div>
+      <span style="color:var(--t3);font-size:14px;flex-shrink:0">→</span>
+    </div>`).join('');
+
+  // Store recs globally so selectRec can find them
+  window._recs=recs;
+}
+function selectRec(id){
+  selectedRec=id;
+  document.querySelectorAll('.rec-card').forEach(c=>{
+    c.classList.toggle('sel',c.getAttribute('onclick')===`selectRec('${id}')`);
+  });
+  const r=(window._recs||[]).find(x=>x.id===id);
+  if(!r)return;
+  document.getElementById('recDetail').innerHTML=`
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--t)">${r.title}</h3>
+    <p style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:14px">${r.desc}</p>
+    <div style="background:rgba(29,216,130,.08);border:1px solid rgba(29,216,130,.15);border-radius:9px;padding:13px;margin-bottom:14px">
+      <div style="font-size:10px;color:var(--t3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px">Daily Savings</div>
+      <div style="font-size:22px;font-weight:700;color:var(--gh);font-family:var(--fm)">${r.savings_kg} kg CO₂</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:3px">≈ ${(r.savings_kg*365/1000).toFixed(4)} t per year</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Implementation Steps</div>
+    <div class="step-list">${(r.steps||[]).map((s,i)=>`<div class="step"><div class="step-num">${i+1}</div><span>${s}</span></div>`).join('')}</div>
+    <button class="btn btn-primary" style="margin-top:14px;width:100%;justify-content:center">⚡ Mark as Implemented</button>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// REPORTS
+// ═══════════════════════════════════════════════════════
+function renderReports(){
+  if(!items.length){document.getElementById('rptNoData').style.display='block';document.getElementById('rptContent').style.display='none';return;}
+  document.getElementById('rptNoData').style.display='none';document.getElementById('rptContent').style.display='block';
+  const total_daily=items.reduce((a,s)=>a+s.total_daily_kg,0);
+  const ann=total_daily*365;
+  const offset=ann*0.155;
+  const net=ann-offset;
+  const score=total_daily<0.001?'A+':total_daily<0.01?'A':total_daily<0.05?'B+':total_daily<0.1?'B':'C';
+  document.getElementById('rptStats').innerHTML=[
+    {icon:'📊',l:'Total Emissions',v:(ann/1000).toFixed(2)+'t',sub:'CO₂ equivalent'},
+    {icon:'🌿',l:'Carbon Offset',v:(offset/1000).toFixed(2)+'t',sub:'-15.5% reduction',g:true},
+    {icon:'🌍',l:'Net Emissions',v:(net/1000).toFixed(2)+'t',sub:'After offsets'},
+    {icon:'🏆',l:'Efficiency Score',v:score,sub:'↑ from last period',g:true},
+  ].map(s=>`<div class="stat-card" style="display:flex;gap:10px;align-items:flex-start"><div style="font-size:22px">${s.icon}</div><div><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px;color:${s.g?'var(--gh)':'var(--t)'}">${s.v}</div><div class="stat-sub">${s.sub}</div></div></div>`).join('');
+  rptTab('overview',document.querySelector('#page-reports .tab.active')||document.querySelector('#page-reports .tab'));
+}
+function rptTab(tab,btn){
+  document.querySelectorAll('#page-reports .tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ['overview','breakdown','certs','export'].forEach(t=>document.getElementById('rpt'+t.charAt(0).toUpperCase()+t.slice(1)).style.display=t===tab?'block':'none');
+  if(tab==='overview'){
+    const total_daily=items.reduce((a,s)=>a+s.total_daily_kg,0);
+    const timeline=['Jul 24','Aug 24','Sep 24','Oct 24','Nov 24','Dec 24'].map(m=>({month:m,value:+(total_daily*30*(0.95+Math.random()*.1)).toFixed(1)}));
+    document.getElementById('rptOverview').innerHTML=`
+      <div class="g-main">
+        <div class="card"><div class="card-title">Emissions Over Time</div><div class="card-sub">Monthly gross CO₂ — ${document.getElementById('reportPeriod').value}</div><canvas id="rptChart" style="width:100%;height:240px"></canvas></div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">Certifications</div>
+          ${[{name:'Carbon Neutral',status:'in progress',target:'Q2 2025'},{name:'Science Based Targets',status:'pending',target:'Q4 2025'},{name:'ISO 14001',status:'achieved',target:'Achieved'}]
+            .map(c=>`<div class="cert"><div><div class="cert-name">${c.name}</div><div class="cert-date">${c.target}</div></div><span class="badge ${c.status==='in progress'?'badge-blue':c.status==='achieved'?'badge-green':'badge-amber'}">${c.status}</span></div>`).join('')}
+        </div>
+      </div>`;
+    setTimeout(()=>drawLineChart('rptChart',timeline,'CO₂'),60);
+  }
+  if(tab==='breakdown'){
+    document.getElementById('rptBreakdown').innerHTML=`<div class="card"><canvas id="rptBarChart" style="width:100%;height:300px"></canvas></div>`;
+    const chartData=items.map(s=>({name:(s.service_name||s.device_name||'—').slice(0,10),value:+(s.total_daily_kg*7).toFixed(4)}));
+    setTimeout(()=>drawBarChart('rptBarChart',chartData),60);
+  }
+  if(tab==='certs'){
+    document.getElementById('rptCerts').innerHTML=`<div class="card">${[
+      {name:'Carbon Neutral',status:'in progress',target:'Q2 2025',desc:'On track — 68% of milestones met'},
+      {name:'Science Based Targets',status:'pending',target:'Q4 2025',desc:'Baseline assessment in progress'},
+      {name:'ISO 14001',status:'achieved',target:'2024',desc:'Environmental management system certified'},
+      {name:'RE100',status:'pending',target:'2026',desc:'100% renewable electricity commitment'},
+    ].map(c=>`<div class="cert"><div><div class="cert-name">${c.name}</div><div class="cert-date">${c.desc}</div></div><div style="text-align:right"><span class="badge ${c.status==='achieved'?'badge-green':c.status==='in progress'?'badge-blue':'badge-amber'}">${c.status}</span><div style="font-size:10px;color:var(--t3);margin-top:3px">${c.target}</div></div></div>`).join('')}</div>`;
+  }
+  if(tab==='export'){
+    document.getElementById('rptExport').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--t2);margin-bottom:16px">Export for stakeholders, investors, and regulatory compliance.</p>${
+      ['PDF — Full ESG Report (GHG Protocol)','CSV — Raw Emission Data','JSON — API Export','XLSX — Detailed Breakdown','GHG Protocol Format'].map(f=>`<button class="btn btn-outline" style="display:block;margin-bottom:10px;width:100%;justify-content:flex-start;text-align:left">⤓  ${f}</button>`).join('')}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CSV MODE
+// ═══════════════════════════════════════════════════════
+function renderCSVUpload(){
+  makeUploadZone('csvUploadZone',async(file)=>{
+    const text=await file.text();
+    const parsed=processCSV(text);
+    if(!parsed.length){toast('No valid rows found','error','❌');return;}
+    items=parsed;
+    toast(`✅ Loaded ${items.length} items`,'success','🌿');
+    const total=items.reduce((a,s)=>a+s.total_daily_kg,0);
+    document.getElementById('csvResults').style.display='block';
+    document.getElementById('csvStats').innerHTML=[
+      {l:'ROWS',v:items.length,icon:'📂'},
+      {l:'TOTAL CO₂/DAY',v:total.toFixed(4)+' kg',icon:'☁'},
+      {l:'DEVICES',v:items.filter(x=>x.row_type==='device').length,icon:'💻'},
+      {l:'SERVICES',v:items.filter(x=>x.row_type==='service').length,icon:'☁'},
+    ].map(s=>`<div class="stat-card"><span class="stat-icon">${s.icon}</span><div class="stat-label">${s.l}</div><div class="stat-value" style="font-size:20px">${s.v}</div></div>`).join('');
+    document.getElementById('csvTable').innerHTML=items.map(s=>{
+      const name=s.service_name||s.device_name||'—';
+      const ann=s.total_annual_kg||s.total_daily_kg*365;
+      return `<tr><td>${name}</td><td><span class="badge ${s.row_type==='device'?'badge-blue':'badge-green'}">${s.row_type}</span></td><td class="mono">${s.total_daily_kg.toFixed(6)}</td><td class="mono">${ann.toFixed(3)}</td><td>${s.region||'—'}</td><td class="mono">${(ann/21.77).toFixed(1)}</td></tr>`;
+    }).join('');
+    renderDashboard();renderAttribution();renderForecasting();renderOptimization();renderReports();
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+renderEstForm();
+renderCSVUpload();
+makeUploadZone('dashUploadZone',handleCSVFile);
+startLivePolling();
+</script>
+</body>
+</html>
