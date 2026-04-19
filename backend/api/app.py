@@ -17,10 +17,6 @@ from flask import send_from_directory
 import os
 
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "../../frontend")
-app = Flask(__name__)
-@app.route("/")
-def serve_frontend():
-    return send_from_directory(FRONTEND_DIR, "index.html")
 
 # Adjust sys.path so core/ is importable
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -35,6 +31,14 @@ import pandas as pd
 
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+from flask import send_from_directory
+
+FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "../../frontend")
+
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(FRONTEND_DIR, "index.html")
 
 # ── Singletons
 calculator = CarbonCalculator()
